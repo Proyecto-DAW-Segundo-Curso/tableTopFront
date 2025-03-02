@@ -1,0 +1,21 @@
+<header>
+    <!-- Logo -->
+    <div class="logo">
+      <img src="assets/logo-gemini.png" alt="Logo de Table Top">
+    </div>
+  
+    <!-- Nombre de la aplicación -->
+    <h1>{{ appName }}</h1>
+  
+    <!-- Navbar para usuarios logueados -->
+    <nav *ngIf="isLoggedIn">
+      <button routerLink="/listar-partidas">Listar Partidas</button>
+      <button routerLink="/crear-partida">Crear Partida</button>
+      <button (click)="logout()">Cerrar Sesión</button> <!-- Opcional -->
+    </nav>
+  
+    <!-- Botón para usuarios no logueados -->
+    <div *ngIf="!isLoggedIn">
+      <button (click)="redirectToLogin()">Iniciar Sesión</button>
+    </div>
+  </header>
