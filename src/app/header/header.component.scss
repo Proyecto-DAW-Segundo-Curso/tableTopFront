@@ -1,31 +1,43 @@
 header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .logo img {
-    height: 50px; /* Ajusta el tamaño del logo */
-  }
-  
-  h1 {
-    margin: 0;
-    font-size: 24px;
-  }
-  
-  nav button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  nav button:hover {
-    background-color: #0056b3;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #2F3136;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo img {
+  /* Ajusta el tamaño del logo */
+  height: 50px;
+  margin-left: 15px;
+}
+
+.app-name {
+  margin-left: 10px;
+  font-size: 35px;
+}
+
+.custom-button {
+  padding: 10px 20px;
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+nav button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+nav button:hover {
+  background-color: #0056b3;
+}

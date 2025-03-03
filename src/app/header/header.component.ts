@@ -11,7 +11,6 @@ import { Router } from '@angular/router';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  appName = 'Table Top'; // Nombre de la aplicación
   isLoggedIn = false; // Estado de autenticación
 
   constructor(private authService: AuthService, private router: Router) {
