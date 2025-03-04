@@ -29,7 +29,7 @@
         <button type="submit" class="btn login-btn mt-3" [disabled]="loginForm.invalid">Log In</button>
       </form>
       <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
-      <p class="text-center text-white">Don't have an account? <a class="app-text-orange" routerLink="/register">Register here</a></p>
+      <p class="text-center text-white">Don't have an account? <a class="app-text-orange" [routerLink]="'/register'">Register here</a></p>
     </div>
   </div>
 </div>
