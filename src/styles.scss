@@ -19,6 +19,7 @@ body {
 
 /* Estilos de la tarjeta del formulario*/
 .login-card {
+  min-width: 360px;
   max-width: 400px;
   background: rgb(47, 49, 54, 0.5);
   border-radius: 12px;
@@ -46,6 +47,13 @@ body {
 .login-btn {
   background-color: #FF881F;
   color: #2F3136;
+  font-weight: bold;
+  width: 100%;
+}
+
+.login-btn:hover {
+  background-color: #2F3136;
+  color: #885821;
   font-weight: bold;
   width: 100%;
 }
