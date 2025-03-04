@@ -21,8 +21,9 @@ export class AuthService {
     if (email === this.validEmail && password === this.validPassword) {
       this.authenticate = true;
       this.router.navigate(['/dashboard']); // Redirige al dashboard
+      return true;
     }
-    return this.isAuthenticated();
+    return false;
   }
 
   // Método para simular el cierre de sesión
