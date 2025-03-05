@@ -18,9 +18,9 @@ export class RegisterComponent {
   constructor(private fb: FormBuilder, private router: Router, private authService: SpringAuthService) {
     // Inicializa el formulario reactivo
     this.registerForm = this.fb.group({
-      userName: ['user', ],
-      email: ['user@gmail.com', ],
-      password: ['user1234', ],
+      userName: ['', ],
+      email: ['', ],
+      password: ['', ],
     })
   }
 

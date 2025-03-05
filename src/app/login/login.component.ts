@@ -20,8 +20,8 @@ export class LoginComponent {
   constructor(private fb: FormBuilder, private authService: SpringAuthService, private router: Router) {
     // Inicializa el formulario reactivo
     this.loginForm = this.fb.group({
-      email: ['user@gmail.com', Validators.required],
-      password: ['user1234', Validators.required,]
+      email: ['', Validators.required],
+      password: ['', Validators.required,]
     })
   }
 
