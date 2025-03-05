@@ -12,7 +12,7 @@
         <div class="form-group">
           <label class="form-label text-dark" for="email">Correo electrónico</label>
           <input class="form-control login-input" type="email" id="email" formControlName="email" required
-            placeholder="Username">
+            placeholder="Email">
           <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
             <small>El correo electrónico es inválido.</small>
           </div>
