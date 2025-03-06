@@ -1,1 +1,71 @@
 /* You can add global styles to this file, and also import other style files */
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #EDD4B3;
+}
+
+.app-text-orange {
+  color: #FF881F;
+}
+
+/* Estilos de la tarjeta del formulario*/
+.login-card {
+  min-width: 360px;
+  max-width: 400px;
+  background: rgb(47, 49, 54, 0.5);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Encabezado */
+.login-header {
+  background-color: #2F3136;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* Estilos de los inputs */
+.login-input {
+  background-color: #2F3136;
+  color: #885821;
+  border: none;
+}
+
+.login-input::placeholder {
+  color: #885821;
+}
+
+.login-input:focus {
+  background-color: #2F3136;
+  /* Color de fondo cuando está en edición */
+  border-color: #FF881F; // Cambia el color del borde al enfocar
+  outline: none;
+  /* Elimina el contorno azul por defecto */
+}
+
+/* Estilos del botón */
+.login-btn {
+  background-color: #FF881F;
+  color: #2F3136;
+  font-weight: bold;
+  width: 100%;
+}
+
+.login-btn:hover {
+  background-color: #2F3136;
+  color: #885821;
+  font-weight: bold;
+  width: 100%;
+}

@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center align-items-center">
+  <div class="card login-card">
+    <!-- Encabezado -->
+    <div class="login-header">
+      <h3 class="m-0">Register</h3>
+    </div>
+
+    <div class="p-3">
+      <p class="text-center text-white">Please fill all the information gaps</p>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label class="form-label text-dark" for="userName">User name</label>
+          <input class="form-control login-input" type="text" id="userName" formControlName="userName" required
+            placeholder="Username">
+          <div *ngIf="registerForm.get('userName')?.invalid && registerForm.get('userName')?.touched">
+            <small>El usuario es inválido.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label text-dark" for="email">Correo electrónico</label>
+          <input class="form-control login-input" type="email" id="email" formControlName="email" required
+            placeholder="Email">
+          <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+            <small class="text-danger">
+              {{ registerForm.get('email')?.hasError('required') ? 'El correo electrónico es obligatorio.' : 
+                 registerForm.get('email')?.hasError('email') ? 'Ingresa un correo electrónico válido.' : '' }}
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label text-dark" for="password">Contraseña</label>
+          <input class="form-control login-input" type="password" id="password" formControlName="password" required
+            placeholder="Password">
+          <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+            <small class="text-danger">La contraseña debe tener al menos 6 caracteres.</small>
+          </div>
+        </div>
+        <button type="submit" class="btn login-btn mt-3" [disabled]="registerForm.invalid">Register</button>
+      </form>
+
+      <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
+
+      <p class="text-center text-white mt-3">¿Ya tienes una cuenta? <a class="app-text-orange" [routerLink]="'/login'">Inicia sesión aquí</a></p>
+    </div>
+  </div>
+</div>
