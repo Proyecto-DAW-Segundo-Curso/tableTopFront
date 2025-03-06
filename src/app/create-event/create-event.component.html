@@ -1,0 +1,52 @@
+<div class="d-flex justify-content-center align-items-center">
+    <div class="card login-card">
+      <!-- Encabezado -->
+      <div class="login-header">
+        <h3 class="m-0">Nombre Evento</h3>
+      </div>
+  
+      <div class="p-3">
+        <p class="text-center text-white">Please fill all the information gaps</p>
+  
+        <form [formGroup]="gameForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label class="form-label text-dark" for="description">Descripción evento</label>
+            <input class="form-control login-input" type="text" id="description" formControlName="description" required
+              placeholder="description">
+            <div *ngIf="gameForm.get('description')?.invalid && gameForm.get('description')?.touched">
+              <small>La descripción es inválida.</small>
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label class="form-label text-dark" for="date">Fecha evento</label>
+            <input class="form-control login-input" type="date" id="date" formControlName="date" required
+              placeholder="Fecha">
+            <div *ngIf="gameForm.get('date')?.invalid && gameForm.get('date')?.touched">
+              <small>La fecha es inválida.</small> 
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label class="form-label text-dark" for="address">Ubicación evento</label>
+            <input class="form-control login-input" type="text" id="address" formControlName="address" required
+              placeholder="address">
+            <div *ngIf="gameForm.get('address')?.invalid && gameForm.get('address')?.touched">
+              <small>La ubicación es inválida.</small>
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label class="form-label text-dark" for="limit">Límite de participantes</label>
+            <input class="form-control login-input" type="number" id="limit" formControlName="limit" required
+              placeholder="Límite de participantes">
+            <div *ngIf="gameForm.get('limit')?.invalid && gameForm.get('limit')?.touched">
+              <small>Dato inválido.</small> 
+            </div>
+          </div>
+          <button type="submit" class="btn login-btn mt-3" [disabled]="gameForm.invalid">Crear evento</button>
+        </form>
+        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+      </div>
+    </div>
+  </div>

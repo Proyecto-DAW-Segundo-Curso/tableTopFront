@@ -1,0 +1,24 @@
+<header>
+  <div class="name-logo-container d-flex flex-row align-items-center justify-content-around">
+    <!-- Nombre de la aplicación -->
+    <span class="app-name text-white">Table </span><span class="app-name app-text-orange">Top</span>
+
+    <!-- Logo -->
+    <div class="logo">
+      <img src="assets/Logo_TableTop.png" alt="Logo de Table Top">
+    </div>
+
+  </div>
+
+  <!-- Navbar para usuarios logueados -->
+  <nav *ngIf="isLoggedIn">
+    <button routerLink="/listar-partidas">Listar Partidas</button>
+    <button routerLink="/crear-partida">Crear Partida</button>
+    <button (click)="logout()">Cerrar Sesión</button> <!-- Opcional -->
+  </nav>
+
+  <!-- Botón para usuarios no logueados -->
+  <div *ngIf="!isLoggedIn">
+    <button class="btn btn-primary custom-button" (click)="redirectToLogin()">Login</button>
+  </div>
+</header>
