@@ -1,0 +1,47 @@
+<div class="container">
+    <div class="events-grid">
+        <!-- Tarjetas de eventos existentes -->
+        <div class="card" *ngFor="let event of events">
+            <!-- Header del evento -->
+            <div class="event-header">
+                <h3 class="m-0">{{ event.title }}</h3>
+            </div>
+
+            <div class="card-content" *ngIf="!showParticipants[event.id]">
+                <div class="field">
+                    <label>Descripción del evento</label>
+                    <p>{{ event.description }}</p>
+                </div>
+                <div class="field">
+                    <label>Fecha de evento</label>
+                    <p>{{ event.date }}</p>
+                </div>
+                <div class="field">
+                    <label>Ubicación de evento</label>
+                    <p>{{ event.location }}</p>
+                </div>
+                <div class="field">
+                    <label>Límite de participantes</label>
+                    <p>{{ event.participants.length }} / {{ event.maxParticipants }}</p>
+                </div>
+                <div class="button-container">
+                    <button class="btn" (click)="toggleParticipantsList(event.id)">Lista de participantes</button>
+                    <button class="btn" (click)="toggleJoin(event.id)" [class.joined]="isJoined[event.id]">
+                        {{ isJoined[event.id] ? 'Retirarse' : 'Unirse' }}
+                    </button>
+                </div>
+            </div>
+            <div class="card-content" *ngIf="showParticipants[event.id]">
+                <h2>Lista de Participantes</h2>
+                <div class="participants-list">
+                    <div class="participant" *ngFor="let participant of event.participants">
+                        {{ participant }}
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn" (click)="toggleParticipantsList(event.id)">Volver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

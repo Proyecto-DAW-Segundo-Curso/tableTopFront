@@ -1,0 +1,33 @@
+.dashboard-container {
+  padding: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #2F3136;
+  border-radius: 5px;
+  color: white;
+  margin-bottom: 20px;
+  width: fit-content;
+
+  i {
+    color: #FF881F;
+    font-size: 1.2em;
+  }
+
+  strong {
+    color: #FF881F;
+  }
+}
+
+h2 {
+  color: #2F3136;
+  margin-bottom: 15px;
+}
+
+p {
+  color: #4a4a4a;
+}
