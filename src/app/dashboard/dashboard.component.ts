@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { EventosComponent } from '../eventos/eventos.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [EventosComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
