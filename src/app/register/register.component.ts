@@ -38,8 +38,8 @@ export class RegisterComponent {
       this.errorMessage = '';
 
       try {
-        const { email, password } = this.registerForm.value;
-        await this.authService.register(email, password);
+        const { email, password, userName } = this.registerForm.value;
+        await this.authService.register(email, password, userName);
       } catch (err: any) {
         this.errorMessage = 'Error al registrarse: ' + (err.message || 'Intente nuevamente');
       }finally{
