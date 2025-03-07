@@ -18,7 +18,62 @@ header {
   font-size: 35px;
 }
 
-.custom-button {
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  margin-left: 20px;
+
+  i {
+    color: #FF881F;
+    font-size: 1.2em;
+  }
+
+  strong {
+    color: #FF881F;
+  }
+}
+
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+nav {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  button {
+    padding: 8px 16px;
+    background-color: #FF881F;
+    color: #2F3136;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #2F3136;
+      color: #885821;
+    }
+  }
+
+  .create-event-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    i {
+      font-size: 14px;
+    }
+  }
+}
+
+.login-button {
   padding: 10px 20px;
   background-color: transparent;
   color: white;
@@ -26,18 +81,51 @@ header {
   border-radius: 5px;
   cursor: pointer;
   font-size: 24px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: #FF881F;
+  }
 }
 
-nav button {
-  margin-left: 10px;
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: white;
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.custom-button {
+  padding: 10px 20px;
+  background-color: #FF881F;
+  color: #2F3136;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+
+  &:hover {
+    background-color: #2F3136;
+    color: #885821;
+  }
 }
 
-nav button:hover {
-  background-color: #0056b3;
+.create-event-btn {
+  padding: 8px 16px;
+    background-color: #FF881F;
+    color: #2F3136;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #2F3136;
+      color: #885821;
+    
+  }
+
+  i {
+    font-size: 14px;
+  }
 }
