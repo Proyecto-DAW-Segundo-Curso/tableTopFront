@@ -85,4 +85,13 @@ export class AuthService {
     return this.auth.currentUser ? this.auth.currentUser.displayName : null;
   }
 
+  async getToken(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    if (user) {
+      user.getIdTokenResult().then((idTokenResult) => {
+        return idTokenResult;
+      })
+    }
+    return null;
+  }
 }
