@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { SpringAuthService } from '../spring-auth.service';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-register',
@@ -15,11 +15,12 @@ export class RegisterComponent {
   registerForm: FormGroup;
   errorMessage: string = '';
   successMessage: string = '';
+  loading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
-    private authService: SpringAuthService,
-    private router: Router
+    private authService: AuthService,
+    // private router: Router
   ) {
     this.registerForm = this.fb.group({
       userName: ['', [Validators.required]],
@@ -29,40 +30,21 @@ export class RegisterComponent {
   }
 
   // Método para manejar el envío del formulario
-  onSubmit() {
+  async onSubmit() {
     console.log('Estado del formulario:', this.registerForm.value);
-    
-    if (this.registerForm.invalid) {
-      this.errorMessage = 'Por favor, completa todos los campos correctamente.';
-      return;
-    }
 
-    const formValues = this.registerForm.value;
-    const nombre = formValues.userName?.trim();
-    const email = formValues.email?.trim();
-    const password = formValues.password?.trim();
+    if (this.registerForm.valid) {
+      this.loading = true;
+      this.errorMessage = '';
 
-    if (!nombre || !email || !password) {
-      this.errorMessage = 'Todos los campos son obligatorios.';
-      return;
-    }
-
-    this.authService.register(nombre, email, password).subscribe({
-      next: (response) => {
-        console.log('Registro exitoso:', response);
-        this.successMessage = 'Registro exitoso. Redirigiendo al login...';
-        this.errorMessage = '';
-        
-        // Esperar 2 segundos antes de redirigir
-        setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 2000);
-      },
-      error: (err) => {
-        console.error('Error en el registro:', err);
-        this.errorMessage = err.message || 'Error en el registro. Por favor intenta nuevamente.';
-        this.successMessage = '';
+      try {
+        const { email, password } = this.registerForm.value;
+        await this.authService.register(email, password);
+      } catch (err: any) {
+        this.errorMessage = 'Error al registrarse: ' + (err.message || 'Intente nuevamente');
+      }finally{
+        this.loading = false;
       }
-    });
+    }    
   }
 }
