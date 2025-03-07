@@ -1,34 +1,82 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Auth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, User, UserCredential } from '@angular/fire/auth';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly validEmail = 'user@gmail.com'; // Credenciales fijas
-  private readonly validPassword = 'user1234';
-  private authenticate = false; // Simula el estado de autenticación
 
-  constructor( private router: Router ) { }
+  private currentUserSubject: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
+  public currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
 
-  // Método para verificar si el usuario está autenticado
-  isAuthenticated(): boolean {
-    return this.authenticate;
+  constructor(private auth: Auth, private router: Router) {
+    // Persistencia del estado de autenticación
+    onAuthStateChanged(this.auth, (user) => {
+      this.currentUserSubject.next(user);
+      if (user) {
+        console.log('Usuario autenticado con UID:', user.uid);
+        user.getIdTokenResult().then((idTokenResult) => {
+          console.log('Token de autenticación:', idTokenResult);
+        }).catch((error) => {
+          console.error('Error al obtener el token de autenticación:', error);
+        });
+        
+      } else {
+        console.log('Usuario no autenticado');
+      }
+    });
   }
 
-  // Método para simular el inicio de sesión
-  login( email: string, password: string): boolean {
-    if (email === this.validEmail && password === this.validPassword) {
-      this.authenticate = true;
-      this.router.navigate(['/dashboard']); // Redirige al dashboard
-      return true;
+  // Registrar nuevo usuario
+  async register(email: string, password: string): Promise<UserCredential> {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+      this.router.navigate(['/dashboard']);
+      return userCredential;
+    } catch (error) {
+      console.error('Error al registrar usuario:', error);
+      throw error;
     }
-    return false;
   }
 
-  // Método para simular el cierre de sesión
-  logout() {
-    this.authenticate = false;
-    this.router.navigate(['/login']);
+  // Iniciar sesión
+  async login(email: string, password: string): Promise<UserCredential> {
+    try {
+      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+      this.router.navigate(['/dashboard']);
+      return userCredential;
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      throw error;
+    }
   }
+
+  // Cerrar sesión
+  async logout(): Promise<void> {
+    try {
+      await signOut(this.auth);
+      this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      throw error;
+    }
+  }
+
+  // Obtener usuario actual
+  getCurrentUser(): User | null {
+    return this.auth.currentUser;
+  }
+
+  // Verificar si el usuario está autenticado
+  isAuthenticated(): boolean {
+    return this.auth.currentUser !== null;
+  }
+
+  // Obtener UID del usuario
+  getUserId(): string | null {
+    return this.auth.currentUser ? this.auth.currentUser.uid : null;
+  }
+
 }
