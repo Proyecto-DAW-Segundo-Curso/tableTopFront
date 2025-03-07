@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
-import { Router, RouterLinkActive, RouterModule, RouterOutlet } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { SpringAuthService } from '../spring-auth.service';
 
 @Component({
   selector: 'app-login',
@@ -16,51 +15,37 @@ export class LoginComponent {
 
   loginForm: FormGroup;
   errorMessage: string = '';
+  loading: boolean = false;
 
-  constructor(private fb: FormBuilder, private authService: SpringAuthService, private router: Router) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {
     // Inicializa el formulario reactivo
     this.loginForm = this.fb.group({
-      email: ['', Validators.required],
-      password: ['', Validators.required,]
-    })
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
   }
 
   // Método para manejar el envío del formulario
-  onSubmit() {
+  async onSubmit() {
+
     if (this.loginForm.valid) {
-      // Codigo DeepSeck
-      const email = this.loginForm.get('email')?.value;
-      const password = this.loginForm.get('password')?.value;
+      this.loading = true;
+      this.errorMessage = '';
 
-      // const { email, password } = this.loginForm.value;
-
-      // Codigo DeepSeck
-      // Intenta autenticar al usuario
-      //   if (this.authService.login(email, password)) {
-      //     //this.router.navigate(['/dashboard']); // Redirige al dashboard
-      //     console.log('Usuario autenticado');
-      //     this.authService.isAuthenticated();
-
-      //   } else {
-      //     this.errorMessage = 'Email o contraseña incorrectos';
-      //   }
-      // } else {
-      //   this.errorMessage = 'Por favor, completa el formulario correctamente';
-      if (!email || !password) {
-        this.errorMessage = 'Por favor, ingresa tu correo y contraseña.';
-        return;
-      }
-
-      this.authService.login(email, password).subscribe({
-        next: () => {
-          this.router.navigate(['/dashboard']);
-        },
-        error: (err) => {
-          this.errorMessage = err.message || 'Error en la autenticación.';
-          console.error('Error en el login:', err);
+      try {
+        const { email, password } = this.loginForm.value;
+        await this.authService.login(email, password);
+      } catch (err: any) {
+        if (err.status === 400) {
+          this.errorMessage = err.error?.message || 'Datos de login incorrectos. Por favor verifica tu email y contraseña.';
+        } else if (err.status === 401) {
+          this.errorMessage = 'Credenciales incorrectas';
+        } else {
+          this.errorMessage = 'Error al iniciar sesión: ' + (err.message || 'Intente nuevamente');
         }
-      })
-
+      } finally {
+        this.loading = false;
+      }
     }
   }
 }

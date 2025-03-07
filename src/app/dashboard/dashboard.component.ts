@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from '../auth.service';
 import { EventosComponent } from '../eventos/eventos.component';
 
 @Component({
@@ -8,5 +9,11 @@ import { EventosComponent } from '../eventos/eventos.component';
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
+
+  userName: string | null = null;
+
+  constructor(private authService: AuthService) {
+    this.userName = this.authService.getUserName();
+  }
 
 }

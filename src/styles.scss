@@ -43,6 +43,18 @@ body {
   border: none;
 }
 
+.login-input::placeholder {
+  color: #885821;
+}
+
+.login-input:focus {
+  background-color: #2F3136;
+  /* Color de fondo cuando está en edición */
+  border-color: #FF881F; // Cambia el color del borde al enfocar
+  outline: none;
+  /* Elimina el contorno azul por defecto */
+}
+
 /* Estilos del botón */
 .login-btn {
   background-color: #FF881F;
@@ -57,4 +69,3 @@ body {
   font-weight: bold;
   width: 100%;
 }
-

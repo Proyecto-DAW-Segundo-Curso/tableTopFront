@@ -21,9 +21,12 @@
         <div class="form-group">
           <label class="form-label text-dark" for="email">Correo electrónico</label>
           <input class="form-control login-input" type="email" id="email" formControlName="email" required
-            placeholder="Username">
+            placeholder="Email">
           <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
-            <small>El correo electrónico es inválido.</small>
+            <small class="text-danger">
+              {{ registerForm.get('email')?.hasError('required') ? 'El correo electrónico es obligatorio.' : 
+                 registerForm.get('email')?.hasError('email') ? 'Ingresa un correo electrónico válido.' : '' }}
+            </small>
           </div>
         </div>
 
@@ -32,12 +35,16 @@
           <input class="form-control login-input" type="password" id="password" formControlName="password" required
             placeholder="Password">
           <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
-            <small>La contraseña debe tener al menos 6 caracteres.</small>
+            <small class="text-danger">La contraseña debe tener al menos 6 caracteres.</small>
           </div>
         </div>
         <button type="submit" class="btn login-btn mt-3" [disabled]="registerForm.invalid">Register</button>
       </form>
-      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
+
+      <p class="text-center text-white mt-3">¿Ya tienes una cuenta? <a class="app-text-orange" [routerLink]="'/login'">Inicia sesión aquí</a></p>
     </div>
   </div>
 </div>
