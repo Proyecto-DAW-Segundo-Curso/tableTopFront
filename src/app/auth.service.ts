@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Auth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, User, UserCredential } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile, User, UserCredential } from '@angular/fire/auth';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -30,9 +30,11 @@ export class AuthService {
   }
 
   // Registrar nuevo usuario
-  async register(email: string, password: string): Promise<UserCredential> {
+  async register(email: string, password: string, username: string): Promise<UserCredential> {
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+      await updateProfile(userCredential.user, { displayName: username });
+      console.log('Usuario registrado con nombre:', userCredential.user.displayName);
       this.router.navigate(['/dashboard']);
       return userCredential;
     } catch (error) {
@@ -77,6 +79,10 @@ export class AuthService {
   // Obtener UID del usuario
   getUserId(): string | null {
     return this.auth.currentUser ? this.auth.currentUser.uid : null;
+  }
+
+  getUserName(): string | null {
+    return this.auth.currentUser ? this.auth.currentUser.displayName : null;
   }
 
 }
