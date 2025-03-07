@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EventService } from '../services/event.service';
+import { EventsService } from '../events.service';
 
 @Component({
   selector: 'app-create-event',
@@ -18,11 +18,10 @@ export class CreateEventComponent {
   constructor(
     private fb: FormBuilder, 
     private router: Router,
-    private eventService: EventService
+    private eventService: EventsService
   ) {
     this.gameForm = this.fb.group({
       title: ['', Validators.required],
-      description: ['', Validators.required],
       date: ['', Validators.required],
       location: ['', Validators.required],
       maxParticipants: ['', [Validators.required, Validators.min(1)]]
@@ -33,11 +32,10 @@ export class CreateEventComponent {
     if (this.gameForm.valid) {
       try {
         this.eventService.addEvent({
-          title: this.gameForm.get('title')?.value,
-          description: this.gameForm.get('description')?.value,
-          date: this.gameForm.get('date')?.value,
+          name: this.gameForm.get('title')?.value,
+          date_time: this.gameForm.get('date')?.value,
           location: this.gameForm.get('location')?.value,
-          maxParticipants: parseInt(this.gameForm.get('maxParticipants')?.value)
+          max_players: parseInt(this.gameForm.get('maxParticipants')?.value)
         });
         
         this.router.navigate(['/eventos']);
