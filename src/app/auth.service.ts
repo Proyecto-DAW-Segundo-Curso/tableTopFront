@@ -17,12 +17,6 @@ export class AuthService {
       this.currentUserSubject.next(user);
       if (user) {
         console.log('Usuario autenticado con UID:', user.uid);
-        user.getIdTokenResult().then((idTokenResult) => {
-          console.log('Token de autenticación:', idTokenResult);
-        }).catch((error) => {
-          console.error('Error al obtener el token de autenticación:', error);
-        });
-        
       } else {
         console.log('Usuario no autenticado');
       }
@@ -85,13 +79,23 @@ export class AuthService {
     return this.auth.currentUser ? this.auth.currentUser.displayName : null;
   }
 
+  // Obtener token de Firebase
   async getToken(): Promise<string | null> {
     const user = this.auth.currentUser;
-    if (user) {
-      user.getIdTokenResult().then((idTokenResult) => {
-        return idTokenResult;
-      })
+    if (!user) {
+      console.error('No hay usuario autenticado para obtener token');
+      return null;
     }
-    return null;
+    
+    try {
+      console.log('Obteniendo token para usuario:', user.uid);
+      // Forzamos actualización del token
+      const token = await user.getIdToken(true);
+      console.log('Token obtenido correctamente:', token.substring(0, 20) + '...');
+      return token;
+    } catch (error) {
+      console.error('Error al obtener el token:', error);
+      return null;
+    }
   }
 }
