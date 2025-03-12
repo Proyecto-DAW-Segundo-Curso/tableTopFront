@@ -59,42 +59,6 @@
     align-items: center;
 }
 
-.event-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.edit-btn, .delete-btn {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    padding: 0 10px;
-    transition: color 0.3s;
-    
-    &[disabled] {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-}
-
-.edit-btn {
-    color: #FF881F;
-    
-    &:hover:not([disabled]) {
-        color: darken(#FF881F, 10%);
-    }
-}
-
-.delete-btn {
-    color: #dc3545;
-    
-    &:hover:not([disabled]) {
-        color: darken(#dc3545, 10%);
-    }
-}
-
 .card-content {
     display: flex;
     flex-direction: column;
@@ -134,13 +98,12 @@
     background-color: #FF881F;
     color: #2F3136;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color 0.3s;
     font-weight: bold;
 
     &:hover:not([disabled]) {
         background-color: #2F3136;
         color: #885821;
-        transform: translateY(-2px);
     }
 
     &.joined {
@@ -155,7 +118,6 @@
     &[disabled] {
         opacity: 0.7;
         cursor: not-allowed;
-        transform: none;
     }
 }
 
@@ -165,48 +127,13 @@
     gap: 10px;
     max-height: 200px;
     overflow-y: auto;
-    padding: 5px;
-    
-    &::-webkit-scrollbar {
-        width: 8px;
-    }
-    
-    &::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-        background: #FF881F;
-        border-radius: 4px;
-        
-        &:hover {
-            background: darken(#FF881F, 10%);
-        }
-    }
 }
 
 .participant {
     padding: 10px;
     background: #f5f5f5;
     border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: transform 0.2s;
-    
-    &:hover {
-        transform: translateX(5px);
-    }
-}
-
-.creator-badge {
-    background-color: #FF881F;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.8em;
-    font-weight: bold;
+    text-align: center;
 }
 
 h2 {
@@ -235,6 +162,24 @@ h2 {
     font-style: italic;
     padding: 10px 0;
     text-align: center;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 10px;
+    
+    &:hover:not([disabled]) {
+        color: darken(#dc3545, 10%);
+    }
+    
+    &[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }
 
 .create-event-fab {

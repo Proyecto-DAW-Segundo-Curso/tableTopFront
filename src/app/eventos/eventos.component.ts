@@ -14,16 +14,15 @@ import { AuthService } from '../auth.service';
   providers: [DatePipe]
 })
 export class EventosComponent implements OnInit, OnChanges {
-  @Input() event!: Event;
-  @Output() eventDeleted = new EventEmitter<number>();
-  @Output() eventUpdated = new EventEmitter<void>();
+  @Input() event!: Event; // Recibe un único evento
+  @Output() eventDeleted = new EventEmitter<number>(); // Emite el ID del evento eliminado
+  @Output() eventUpdated = new EventEmitter<void>(); // Notifica cuando un evento ha sido actualizado
 
   showParticipants: boolean = false;
   currentUserId: string = '';
   isJoined: boolean = false;
   error: string = '';
   isLoading: boolean = false;
-  participantNames: { [key: string]: string } = {};
 
   constructor(
     private router: Router, 
@@ -34,52 +33,38 @@ export class EventosComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.loadCurrentUser();
-    this.loadParticipantNames();
   }
   
   ngOnChanges(): void {
+    // Cuando cambie el evento, actualizar el estado
     this.updateJoinStatus();
-    this.loadParticipantNames();
-  }
-
-  async loadParticipantNames(): Promise<void> {
-    if (!this.event?.participants?.length) return;
-
-    try {
-      const user = await this.authService.getCurrentUser();
-      if (user) {
-        this.participantNames[user.uid] = user.email || user.uid;
-        this.event.participants.forEach(id => {
-          if (id !== user.uid) {
-            this.participantNames[id] = id;
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error al cargar nombres de participantes:', error);
-    }
   }
   
+  // Formatear la fecha para evitar el error del DatePipe
   formatDateTime(dateTimeStr: string | any[] | undefined): string {
     if (!dateTimeStr) return 'Fecha no disponible';
     
     try {
+      // Si es un string con formato ISO
       if (typeof dateTimeStr === 'string') {
         if (dateTimeStr.includes('T')) {
           return this.datePipe.transform(new Date(dateTimeStr), 'medium') || 'Fecha inválida';
         }
         
+        // Si es un string que contiene una lista separada por comas
         if (dateTimeStr.includes(',')) {
           const parts = dateTimeStr.split(',').map(part => parseInt(part.trim()));
           if (parts.length >= 3) {
+            // Meses en JavaScript comienzan desde 0 (enero = 0)
             const year = parts[0];
-            const month = parts[1] - 1;
+            const month = parts[1] - 1; // Restar 1 al mes
             const day = parts[2];
             const hours = parts.length > 3 ? parts[3] : 0;
             const minutes = parts.length > 4 ? parts[4] : 0;
             
             const date = new Date(year, month, day, hours, minutes);
             
+            // Verificar si la fecha es válida
             if (isNaN(date.getTime())) {
               console.error('Fecha inválida creada a partir de:', parts);
               return 'Fecha inválida';
@@ -90,15 +75,17 @@ export class EventosComponent implements OnInit, OnChanges {
         }
       }
       
+      // Si es un array
       if (Array.isArray(dateTimeStr) && dateTimeStr.length >= 3) {
         const year = dateTimeStr[0];
-        const month = dateTimeStr[1] - 1;
+        const month = dateTimeStr[1] - 1; // Restar 1 al mes
         const day = dateTimeStr[2];
         const hours = dateTimeStr.length > 3 ? dateTimeStr[3] : 0;
         const minutes = dateTimeStr.length > 4 ? dateTimeStr[4] : 0;
         
         const date = new Date(year, month, day, hours, minutes);
         
+        // Verificar si la fecha es válida
         if (isNaN(date.getTime())) {
           console.error('Fecha inválida creada a partir de:', dateTimeStr);
           return 'Fecha inválida';
@@ -107,11 +94,12 @@ export class EventosComponent implements OnInit, OnChanges {
         return this.datePipe.transform(date, 'medium') || 'Fecha inválida';
       }
       
+      // Si llegamos aquí, no pudimos manejar el formato
       console.warn('Formato de fecha no reconocido:', dateTimeStr);
       return String(dateTimeStr);
       
     } catch (error) {
-      console.error('Error al formatear fecha:', error);
+      console.error('Error al formatear fecha:', error, 'Valor original:', dateTimeStr);
       return 'Error de formato';
     }
   }
@@ -131,30 +119,27 @@ export class EventosComponent implements OnInit, OnChanges {
   updateJoinStatus(): void {
     if (!this.currentUserId || !this.event) return;
     
+    // Verificar si el evento tiene un array de participantes
     if (!this.event.participants || !Array.isArray(this.event.participants)) {
       this.event.participants = [];
       this.isJoined = false;
       return;
     }
     
+    // Verificar si el usuario actual está en la lista de participantes
     this.isJoined = this.event.participants.includes(this.currentUserId);
+    console.log(`Usuario ${this.currentUserId} está en evento ${this.event.id}:`, this.isJoined);
   }
 
   navigateToCreateEvent(): void {
     this.router.navigate(['/create-event']);
   }
 
-  navigateToEditEvent(): void {
-    if (this.event?.id) {
-      this.router.navigate(['/edit-event', this.event.id]);
-    }
-  }
-
   toggleParticipantsList(): void {
     this.showParticipants = !this.showParticipants;
   }
 
-  async toggleJoin(): Promise<void> {
+  toggleJoin(): void {
     if (!this.currentUserId) {
       alert('Debe iniciar sesión para unirse a un evento');
       return;
@@ -165,88 +150,80 @@ export class EventosComponent implements OnInit, OnChanges {
       return;
     }
     
+    // Evitar múltiples clics mientras se procesa
     if (this.isLoading) return;
     this.isLoading = true;
     
-    try {
-      if (this.isJoined) {
-        const leaveObs = await this.eventsService.leaveEvent(this.event.id);
-        leaveObs.subscribe({
-          next: () => {
-            this.isJoined = false;
-            this.eventUpdated.emit();
-            this.isLoading = false;
-          },
-          error: (err) => {
-            console.error('Error al salir del evento:', err);
-            this.isLoading = false;
-          }
-        });
-      } else {
-        if (this.event.participants?.includes(this.currentUserId)) {
-          alert('Ya estás unido a este evento');
+    if (this.isJoined) {
+      // Retirarse del evento
+      this.eventsService.leaveEvent(this.event.id).subscribe({
+        next: (response) => {
+          console.log('Respuesta al salir del evento:', response);
+          this.isJoined = false;
           this.isLoading = false;
-          return;
+          this.eventUpdated.emit(); // Notificar al padre que el evento ha sido actualizado
+        },
+        error: (err) => {
+          console.error('Error al salir del evento:', err);
+          alert('No se pudo salir del evento. Intente nuevamente.');
+          this.isLoading = false;
         }
-        
-        const joinObs = await this.eventsService.joinEvent(this.event.id);
-        joinObs.subscribe({
-          next: () => {
-            this.isJoined = true;
-            this.eventUpdated.emit();
-            this.isLoading = false;
-          },
-          error: (err) => {
-            console.error('Error al unirse al evento:', err);
-            this.isLoading = false;
-          }
-        });
+      });
+    } else {
+      // Validación para no unirse más de una vez
+      if (this.event.participants && 
+          Array.isArray(this.event.participants) && 
+          this.event.participants.includes(this.currentUserId)) {
+        alert('Ya estás unido a este evento');
+        this.isLoading = false;
+        return;
       }
-    } catch (error) {
-      console.error('Error en toggleJoin:', error);
-      this.isLoading = false;
+      
+      // Unirse al evento
+      this.eventsService.joinEvent(this.event.id).subscribe({
+        next: (response) => {
+          console.log('Respuesta al unirse al evento:', response);
+          this.isJoined = true;
+          this.isLoading = false;
+          this.eventUpdated.emit(); // Notificar al padre que el evento ha sido actualizado
+        },
+        error: (err) => {
+          console.error('Error al unirse al evento:', err);
+          alert('No se pudo unir al evento. Intente nuevamente.');
+          this.isLoading = false;
+        }
+      });
     }
   }
   
   canDelete(): boolean {
     if (!this.event || !this.currentUserId) return false;
+    console.log('CanDelete - CreatorId:', this.event.creatorId, 'CurrentId:', this.currentUserId);
     return this.event.creatorId === this.currentUserId;
   }
   
-  canEdit(): boolean {
-    return this.canDelete();
-  }
-  
-  async deleteEvent(): Promise<void> {
+  deleteEvent(): void {
     if (!this.event.id) {
       console.error('El evento no tiene un ID válido');
       return;
     }
     
+    // Evitar múltiples clics mientras se procesa
     if (this.isLoading) return;
     
     if (confirm('¿Está seguro de que desea eliminar este evento?')) {
       this.isLoading = true;
-      try {
-        const deleteObs = await this.eventsService.deleteEvent(this.event.id);
-        deleteObs.subscribe({
-          next: () => {
-            this.isLoading = false;
-            this.eventDeleted.emit(this.event.id);
-          },
-          error: (err) => {
-            console.error('Error al eliminar el evento:', err);
-            this.isLoading = false;
-          }
-        });
-      } catch (error) {
-        console.error('Error en deleteEvent:', error);
-        this.isLoading = false;
-      }
+      this.eventsService.deleteEvent(this.event.id).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.eventDeleted.emit(this.event.id); // Emitir el ID del evento eliminado
+        },
+        error: (err) => {
+          console.error('Error al eliminar el evento:', err);
+          alert('No se pudo eliminar el evento. Intente nuevamente.');
+          this.isLoading = false;
+        }
+      });
     }
-  }
-
-  getParticipantName(id: string): string {
-    return this.participantNames[id] || id;
   }
 }

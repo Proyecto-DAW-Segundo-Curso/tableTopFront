@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { Observable, from, switchMap, catchError, throwError, of, BehaviorSubject, tap } from 'rxjs';
+import { Observable, from, switchMap, catchError, throwError, of } from 'rxjs';
 import { Event } from './event';
 
 @Injectable({
@@ -9,8 +9,6 @@ import { Event } from './event';
 })
 export class EventsService {
   private apiUrl = 'http://localhost:8080/api/events';
-  private eventsSubject = new BehaviorSubject<Event[]>([]);
-  events$ = this.eventsSubject.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -39,58 +37,118 @@ export class EventsService {
     }
   }
 
-  async refreshEvents(): Promise<void> {
-    const headers = await this.getHeaders();
-    this.http.get<Event[]>(this.apiUrl, { headers }).subscribe({
-      next: (events) => this.eventsSubject.next(events),
-      error: (error) => console.error('Error al refrescar eventos:', error)
-    });
-  }
-
-  async getAllEvents(): Promise<Observable<Event[]>> {
-    const headers = await this.getHeaders();
-    return this.http.get<Event[]>(this.apiUrl, { headers }).pipe(
-      tap(events => this.eventsSubject.next(events))
+  // Crear un nuevo evento
+  addEvent(event: any): Observable<Event> {
+    console.log('Enviando evento al backend:', event);
+    
+    return from(this.getHeaders()).pipe(
+      switchMap(headers => {
+        console.log('Realizando petición POST a:', `${this.apiUrl}/create-event`);
+        return this.http.post<Event>(`${this.apiUrl}/create-event`, event, { 
+          headers,
+          withCredentials: true
+        });
+      }),
+      catchError(error => {
+        console.error('Error en addEvent:', error);
+        return throwError(() => new Error(error.message || 'Error al crear el evento'));
+      })
     );
   }
 
-  async getEventById(id: number): Promise<Observable<Event>> {
-    const headers = await this.getHeaders();
-    return this.http.get<Event>(`${this.apiUrl}/${id}`, { headers });
-  }
-
-  async addEvent(event: Event): Promise<Observable<Event>> {
-    const headers = await this.getHeaders();
-    return this.http.post<Event>(this.apiUrl, event, { headers }).pipe(
-      tap(() => this.refreshEvents())
+  // Obtener todos los eventos
+  getAllEvents(): Observable<Event[]> {
+    return from(this.getHeaders()).pipe(
+      switchMap(headers => {
+        return this.http.get<Event[]>(`${this.apiUrl}/`, { 
+          headers,
+          withCredentials: true
+        });
+      }),
+      catchError(error => {
+        console.error('Error en getAllEvents:', error);
+        return throwError(() => new Error(error.message || 'Error al obtener los eventos'));
+      })
     );
   }
 
-  async updateEvent(id: number, event: Event): Promise<Observable<Event>> {
-    const headers = await this.getHeaders();
-    return this.http.put<Event>(`${this.apiUrl}/${id}`, event, { headers }).pipe(
-      tap(() => this.refreshEvents())
+  // Eliminar un evento
+  deleteEvent(eventId: number): Observable<any> {
+    return from(this.getHeaders()).pipe(
+      switchMap(headers => {
+        return this.http.delete(`${this.apiUrl}/${eventId}`, { 
+          headers,
+          withCredentials: true
+        });
+      }),
+      catchError(error => {
+        console.error('Error en deleteEvent:', error);
+        return throwError(() => new Error(error.message || 'Error al eliminar el evento'));
+      })
     );
   }
 
-  async deleteEvent(id: number): Promise<Observable<void>> {
-    const headers = await this.getHeaders();
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers }).pipe(
-      tap(() => this.refreshEvents())
+  // Unirse a un evento
+  joinEvent(eventId: number): Observable<any> {
+    return from(this.getHeaders()).pipe(
+      switchMap(headers => {
+        return this.http.post(`${this.apiUrl}/${eventId}/join`, {}, { 
+          headers,
+          withCredentials: true
+        });
+      }),
+      catchError(error => {
+        console.error('Error en joinEvent:', error);
+        return throwError(() => new Error(error.message || 'Error al unirse al evento'));
+      })
     );
   }
 
-  async joinEvent(id: number): Promise<Observable<Event>> {
-    const headers = await this.getHeaders();
-    return this.http.post<Event>(`${this.apiUrl}/${id}/join`, {}, { headers }).pipe(
-      tap(() => this.refreshEvents())
+  // Salir de un evento
+  leaveEvent(eventId: number): Observable<any> {
+    return from(this.getHeaders()).pipe(
+      switchMap(headers => {
+        return this.http.post(`${this.apiUrl}/${eventId}/leave`, {}, { 
+          headers,
+          withCredentials: true
+        });
+      }),
+      catchError(error => {
+        console.error('Error en leaveEvent:', error);
+        return throwError(() => new Error(error.message || 'Error al salir del evento'));
+      })
     );
   }
 
-  async leaveEvent(id: number): Promise<Observable<Event>> {
-    const headers = await this.getHeaders();
-    return this.http.post<Event>(`${this.apiUrl}/${id}/leave`, {}, { headers }).pipe(
-      tap(() => this.refreshEvents())
+  // Actualizar un evento
+  updateEvent(eventId: number, event: Event): Observable<Event> {
+    return from(this.getHeaders()).pipe(
+      switchMap(headers => {
+        return this.http.put<Event>(`${this.apiUrl}/${eventId}`, event, { 
+          headers,
+          withCredentials: true
+        });
+      }),
+      catchError(error => {
+        console.error('Error en updateEvent:', error);
+        return throwError(() => new Error(error.message || 'Error al actualizar el evento'));
+      })
+    );
+  }
+
+  // Obtener nombres de usuarios por IDs
+  getUserNames(userIds: string[]): Observable<{[key: string]: string}> {
+    return from(this.getHeaders()).pipe(
+      switchMap(headers => {
+        return this.http.post<{[key: string]: string}>(`${this.apiUrl}/user-names`, userIds, {
+          headers,
+          withCredentials: true
+        });
+      }),
+      catchError(error => {
+        console.error('Error al obtener nombres de usuarios:', error);
+        return of({}); // Retorna un objeto vacío en caso de error
+      })
     );
   }
 }

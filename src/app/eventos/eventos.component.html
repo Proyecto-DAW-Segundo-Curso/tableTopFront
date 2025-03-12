@@ -16,14 +16,9 @@
         <!-- Header del evento -->
         <div class="event-header">
             <h3 class="m-0">{{ event.name }}</h3>
-            <div class="event-actions">
-                <button *ngIf="canEdit()" class="edit-btn" (click)="navigateToEditEvent()" [disabled]="isLoading">
-                    ✎
-                </button>
-                <button *ngIf="canDelete()" class="delete-btn" (click)="deleteEvent()" [disabled]="isLoading">
-                    ✕
-                </button>
-            </div>
+            <button *ngIf="canDelete()" class="delete-btn" (click)="deleteEvent()" [disabled]="isLoading">
+                ✕
+            </button>
         </div>
 
         <div class="card-content" *ngIf="!showParticipants">
@@ -52,11 +47,8 @@
                 <div *ngIf="!event.participants || event.participants.length === 0" class="no-participants">
                     Aún no hay participantes
                 </div>
-                <div class="participant" *ngFor="let participantId of event.participants">
-                    {{ getParticipantName(participantId) }}
-                    <span *ngIf="participantId === event.creatorId" class="creator-badge">
-                        Creador
-                    </span>
+                <div class="participant" *ngFor="let participant of event.participants">
+                    {{ participant }}
                 </div>
             </div>
             <div class="button-container">
