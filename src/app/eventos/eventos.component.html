@@ -1,47 +1,71 @@
 <div class="container">
-    <div class="events-grid">
-        <!-- Tarjetas de eventos existentes -->
-        <div class="card" *ngFor="let event of events">
-            <!-- Header del evento -->
-            <div class="event-header">
-                <h3 class="m-0">{{ event.title }}</h3>
-            </div>
-
-            <div class="card-content" *ngIf="!showParticipants[event.id]">
-                <div class="field">
-                    <label>Descripción del evento</label>
-                    <p>{{ event.description }}</p>
-                </div>
-                <div class="field">
-                    <label>Fecha de evento</label>
-                    <p>{{ event.date }}</p>
-                </div>
-                <div class="field">
-                    <label>Ubicación de evento</label>
-                    <p>{{ event.location }}</p>
-                </div>
-                <div class="field">
-                    <label>Límite de participantes</label>
-                    <p>{{ event.participants.length }} / {{ event.maxParticipants }}</p>
-                </div>
-                <div class="button-container">
-                    <button class="btn" (click)="toggleParticipantsList(event.id)">Lista de participantes</button>
-                    <button class="btn" (click)="toggleJoin(event.id)" [class.joined]="isJoined[event.id]">
-                        {{ isJoined[event.id] ? 'Retirarse' : 'Unirse' }}
-                    </button>
-                </div>
-            </div>
-            <div class="card-content" *ngIf="showParticipants[event.id]">
-                <h2>Lista de Participantes</h2>
-                <div class="participants-list">
-                    <div class="participant" *ngFor="let participant of event.participants">
-                        {{ participant }}
-                    </div>
-                </div>
-                <div class="button-container">
-                    <button class="btn" (click)="toggleParticipantsList(event.id)">Volver</button>
-                </div>
+    <div *ngIf="isLoading" class="loading">
+        Cargando eventos...
+    </div>
+    
+    <div *ngIf="error" class="error-message">
+        {{ error }}
+    </div>
+    
+    <div class="card" *ngIf="event">
+        <!-- Overlay de carga para toda la tarjeta -->
+        <div class="loading-overlay" *ngIf="isLoading">
+            <div class="spinner"></div>
+        </div>
+        
+        <!-- Header del evento -->
+        <div class="event-header">
+            <h3 class="m-0">{{ event.name }}</h3>
+            <div class="event-actions">
+                <button *ngIf="canEdit()" class="edit-btn" (click)="navigateToEditEvent()" [disabled]="isLoading">
+                    ✎
+                </button>
+                <button *ngIf="canDelete()" class="delete-btn" (click)="deleteEvent()" [disabled]="isLoading">
+                    ✕
+                </button>
             </div>
         </div>
+
+        <div class="card-content" *ngIf="!showParticipants">
+            <div class="field">
+                <label>Ubicación del evento</label>
+                <p>{{ event.location || 'Sin ubicación' }}</p>
+            </div>
+            <div class="field">
+                <label>Fecha del evento</label>
+                <p>{{ formatDateTime(event.dateTime) }}</p>
+            </div>
+            <div class="field">
+                <label>Límite de participantes</label>
+                <p>{{ event.participants?.length || 0 }} / {{ event.maxPlayers || 0 }}</p>
+            </div>
+            <div class="button-container">
+                <button class="btn" (click)="toggleParticipantsList()">Lista de participantes</button>
+                <button class="btn" [disabled]="isLoading" (click)="toggleJoin()" [class.joined]="isJoined">
+                    {{ isLoading ? 'Procesando...' : (isJoined ? 'Retirarse' : 'Unirse') }}
+                </button>
+            </div>
+        </div>
+        <div class="card-content" *ngIf="showParticipants">
+            <h2>Lista de Participantes</h2>
+            <div class="participants-list">
+                <div *ngIf="!event.participants || event.participants.length === 0" class="no-participants">
+                    Aún no hay participantes
+                </div>
+                <div class="participant" *ngFor="let participantId of event.participants">
+                    {{ getParticipantName(participantId) }}
+                    <span *ngIf="participantId === event.creatorId" class="creator-badge">
+                        Creador
+                    </span>
+                </div>
+            </div>
+            <div class="button-container">
+                <button class="btn" (click)="toggleParticipantsList()">Volver</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="create-event-fab">
+        <button class="btn-fab" (click)="navigateToCreateEvent()">+</button>
     </div>
 </div>

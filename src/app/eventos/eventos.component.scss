@@ -16,15 +16,83 @@
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     height: fit-content;
+    width: 100%;
+    position: relative;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 136, 31, 0.3);
+    border-radius: 50%;
+    border-top-color: #FF881F;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 .event-header {
     background-color: #2F3136;
     color: white;
     text-align: center;
-    padding: 10px 0;
+    padding: 10px 15px;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.event-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.edit-btn, .delete-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 10px;
+    transition: color 0.3s;
+    
+    &[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.edit-btn {
+    color: #FF881F;
+    
+    &:hover:not([disabled]) {
+        color: darken(#FF881F, 10%);
+    }
+}
+
+.delete-btn {
+    color: #dc3545;
+    
+    &:hover:not([disabled]) {
+        color: darken(#dc3545, 10%);
+    }
 }
 
 .card-content {
@@ -66,21 +134,28 @@
     background-color: #FF881F;
     color: #2F3136;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
     font-weight: bold;
 
-    &:hover {
+    &:hover:not([disabled]) {
         background-color: #2F3136;
         color: #885821;
+        transform: translateY(-2px);
     }
 
     &.joined {
         background-color: #dc3545;
         color: white;
 
-        &:hover {
+        &:hover:not([disabled]) {
             background-color: #c82333;
         }
+    }
+    
+    &[disabled] {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
     }
 }
 
@@ -88,17 +163,100 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 5px;
+    
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: #FF881F;
+        border-radius: 4px;
+        
+        &:hover {
+            background: darken(#FF881F, 10%);
+        }
+    }
 }
 
 .participant {
     padding: 10px;
     background: #f5f5f5;
     border-radius: 4px;
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s;
+    
+    &:hover {
+        transform: translateX(5px);
+    }
+}
+
+.creator-badge {
+    background-color: #FF881F;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
 }
 
 h2 {
     text-align: center;
     margin: 0 0 20px 0;
     color: #333;
+}
+
+.loading, .error-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    font-size: 18px;
+}
+
+.error-message {
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+    border-radius: 8px;
+}
+
+.no-participants {
+    color: #666;
+    font-style: italic;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.create-event-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    
+    .btn-fab {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        
+        &:hover {
+            background-color: darken(#007bff, 10%);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+    }
 }
