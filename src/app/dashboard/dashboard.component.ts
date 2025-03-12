@@ -133,11 +133,30 @@ export class DashboardComponent implements OnInit {
   }
   
   handleEventDeleted(eventId: number): void {
-    console.log('Evento eliminado:', eventId);
-    // Eliminamos el evento de la lista local
-    this.events = this.events.filter(event => event.id !== eventId);
+    console.log('Evento eliminado, ID recibido:', eventId);
+
+    // Verificar que eventId es un número válido
+    if (!eventId) {
+      console.error('ID de evento inválido:', eventId);
+      return;
+    }
+
+    // Obtener el evento antes de eliminarlo (para debugging)
+    const eventToRemove = this.events.find(event => event.id === eventId);
+    console.log('Evento a eliminar de la interfaz:', eventToRemove);
+
+    // Eliminar el evento de la lista local
+    const initialLength = this.events.length;
+    this.events = [...this.events.filter(event => event.id !== eventId)];
+
+    // Verificar que el evento se eliminó correctamente
+    if (initialLength === this.events.length) {
+      console.warn('No se encontró el evento con ID', eventId, 'en la lista local');
+    } else {
+      console.log('Evento eliminado de la interfaz correctamente');
+    }
   }
-  
+    
   handleEventUpdated(): void {
     console.log('Evento actualizado, recargando eventos...');
     // Recargamos todos los eventos para tener la lista actualizada

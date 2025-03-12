@@ -78,7 +78,8 @@ export class EventsService {
       switchMap(headers => {
         return this.http.delete(`${this.apiUrl}/${eventId}`, { 
           headers,
-          withCredentials: true
+          withCredentials: true,
+          responseType: 'text'
         });
       }),
       catchError(error => {

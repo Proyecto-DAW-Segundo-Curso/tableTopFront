@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 .dashboard-container {
   padding: 20px;
   min-height: calc(100vh - 64px);
@@ -49,7 +51,7 @@
   transition: background-color 0.3s;
   
   &:hover {
-    background-color: darken(#FF881F, 10%);
+    background-color: color.adjust(#FF881F, $lightness: -10%);
   }
   
   &.large {
@@ -116,7 +118,7 @@
     font-weight: bold;
     
     &:hover {
-      background-color: darken(#dc3545, 10%);
+      background-color: color.adjust(#dc3545, $lightness: -10%);
     }
   }
 }
@@ -163,7 +165,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     
     &:hover {
-      background-color: darken(#FF881F, 10%);
+      background-color: color.adjust(#FF881F, $lightness: -10%);
       box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     }
   }

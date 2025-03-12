@@ -8,7 +8,7 @@ import { AuthService } from '../auth.service';
 @Component({
   selector: 'app-eventos',
   standalone: true,
-  imports: [CommonModule, RouterModule, DatePipe],
+  imports: [CommonModule, RouterModule],
   templateUrl: './eventos.component.html',
   styleUrls: ['./eventos.component.scss'],
   providers: [DatePipe]
@@ -225,5 +225,14 @@ export class EventosComponent implements OnInit, OnChanges {
         }
       });
     }
+  }
+
+  editEvent(): void {
+    if (!this.event.id) {
+      console.error('El evento no tiene un ID válido');
+      return;
+    }
+    
+    this.router.navigate(['/edit-event', this.event.id]);
   }
 }

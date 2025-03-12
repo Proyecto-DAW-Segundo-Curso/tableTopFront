@@ -16,9 +16,14 @@
         <!-- Header del evento -->
         <div class="event-header">
             <h3 class="m-0">{{ event.name }}</h3>
-            <button *ngIf="canDelete()" class="delete-btn" (click)="deleteEvent()" [disabled]="isLoading">
-                ✕
-            </button>
+            <div class="event-actions" *ngIf="canDelete()">
+                <button class="edit-btn" (click)="editEvent()" [disabled]="isLoading">
+                    ✎
+                </button>
+                <button class="delete-btn" (click)="deleteEvent()" [disabled]="isLoading">
+                    ✕
+                </button>
+            </div>
         </div>
 
         <div class="card-content" *ngIf="!showParticipants">
