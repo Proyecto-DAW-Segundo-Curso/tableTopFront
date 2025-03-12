@@ -10,36 +10,21 @@
 
     <!-- Info usuario conectado -->
      <!-- Quitar la ! para que se muestre al logearse -->
-    <div class="user-info" *ngIf="!isLoggedIn"> 
+    <div class="user-info" *ngIf="currentUser$ | async as user"> 
       <i class="fas fa-user"></i>
-      <span>Conectado como: <strong>{{ currentUser }}</strong></span>
+      <span>Conectado como: <strong>{{ user.displayName }}</strong></span>
     </div>
   </div>
 
   <div class="nav-buttons">
     <!-- Navbar para usuarios logueados -->
-    <nav *ngIf="isLoggedIn">
+    <nav *ngIf="currentUser$ | async as user">
       <button routerLink="/dashboard">Dashboard</button>
       <button routerLink="/eventos">Eventos</button>
-      <button class="login-button"routerLink="/eventos">Volver a Eventos</button>
       <button routerLink="/create-event" class="create-event-btn">
         <i class="fas fa-plus"></i> Crear Evento
       </button>
-      <button class="login-button" (click)="logout()">Cerrar Sesión</button>
+      <button class="btn btn-primary custom-button" (click)="logout()">Cerrar Sesión</button>
     </nav>
-
-    <!-- Botón para usuarios no logueados -->
-    <div *ngIf="!isLoggedIn"> 
-      <!-- Quitar el buttton Crear Evento y Volver a Eventos cuando consigamos la conexion -->
-      <button class="login-button"routerLink="/eventos">Volver a Eventos</button>
-      <button routerLink="/create-event" class="create-event-btn"> 
-        <i class="fas fa-plus"></i> Crear Evento
-      </button>
-      <button class="login-button" (click)="redirectToLogin()">Login</button>
-      
-    </div>
-  </div>
-  <div>
-    <button class="btn btn-primary custom-button" (click)="logout()">Salir</button>
   </div>
 </header>

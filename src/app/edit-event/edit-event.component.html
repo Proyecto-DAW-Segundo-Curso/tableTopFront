@@ -1,1 +1,59 @@
-<p>edit-event works!</p>
+<div class="container">
+    <div class="card form-card">
+        <h2>Editar Evento</h2>
+
+        <div *ngIf="loading" class="loading-indicator">
+            <div class="spinner"></div>
+            <p>Cargando evento...</p>
+        </div>
+
+        <div *ngIf="error" class="error-message">
+            {{ error }}
+        </div>
+
+        <form *ngIf="!loading && !error" [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+                <label for="name">Nombre del Evento</label>
+                <input type="text" id="name" formControlName="name" class="form-control">
+                <div *ngIf="eventForm.get('name')?.touched && eventForm.get('name')?.invalid" class="error-text">
+                    <span *ngIf="eventForm.get('name')?.errors?.['required']">El nombre es obligatorio.</span>
+                    <span *ngIf="eventForm.get('name')?.errors?.['minlength']">El nombre debe tener al menos 3 caracteres.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="location">Ubicación</label>
+                <input type="text" id="location" formControlName="location" class="form-control">
+                <div *ngIf="eventForm.get('location')?.touched && eventForm.get('location')?.invalid" class="error-text">
+                    <span *ngIf="eventForm.get('location')?.errors?.['required']">La ubicación es obligatoria.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="dateTime">Fecha y Hora</label>
+                <input type="datetime-local" id="dateTime" formControlName="dateTime" class="form-control">
+                <div *ngIf="eventForm.get('dateTime')?.touched && eventForm.get('dateTime')?.invalid" class="error-text">
+                    <span *ngIf="eventForm.get('dateTime')?.errors?.['required']">La fecha y hora son obligatorias.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="maxPlayers">Límite de Participantes</label>
+                <input type="number" id="maxPlayers" formControlName="maxPlayers" min="2" max="20" class="form-control">
+                <div *ngIf="eventForm.get('maxPlayers')?.touched && eventForm.get('maxPlayers')?.invalid" class="error-text">
+                    <span *ngIf="eventForm.get('maxPlayers')?.errors?.['required']">El límite de participantes es obligatorio.</span>
+                    <span *ngIf="eventForm.get('maxPlayers')?.errors?.['min']">Debe haber al menos 2 participantes.</span>
+                    <span *ngIf="eventForm.get('maxPlayers')?.errors?.['max']">El límite máximo es de 20 participantes.</span>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="btn-secondary" (click)="cancelEdit()" [disabled]="submitting">Cancelar</button>
+                <button type="submit" class="btn-primary" [disabled]="submitting">
+                    <span *ngIf="submitting">Guardando...</span>
+                    <span *ngIf="!submitting">Guardar Cambios</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

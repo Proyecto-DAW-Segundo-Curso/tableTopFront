@@ -1,5 +1,48 @@
 <div class="dashboard-container">
-  <h2>Bienvenido al Dashboard {{ userName }}</h2>
-  <p>Has iniciado sesión correctamente.</p>
-  <app-eventos></app-eventos>
+  <div class="dashboard-header">
+    <h2>Bienvenido al Dashboard, <span class="highlight">{{ userName }}</span></h2>
+    <p>Explora y únete a eventos existentes o crea uno nuevo</p>
+  </div>
+
+  <!-- Estado de carga o error -->
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <span>Cargando eventos...</span>
+  </div>
+  
+  <div *ngIf="error" class="error-message">
+    <i class="error-icon">⚠</i>
+    {{ error }}
+    <button class="retry-btn" (click)="loadEvents()">Reintentar</button>
+  </div>
+  
+  <!-- Contenedor de los eventos -->
+  <div class="events-container" *ngIf="!isLoading && !error">
+    <div class="events-header">
+      <h3>Eventos disponibles ({{ events.length }})</h3>
+      <button class="add-event-btn" (click)="navigateToCreateEvent()">Crear nuevo evento</button>
+    </div>
+    
+    <div class="events-grid">
+      <ng-container *ngFor="let evento of events">
+        <app-eventos 
+          [event]="evento" 
+          (eventDeleted)="handleEventDeleted($event)" 
+          (eventUpdated)="handleEventUpdated()">
+        </app-eventos>
+      </ng-container>
+    </div>
+    
+    <!-- Si no hay eventos, mostrar mensaje -->
+    <div *ngIf="events.length === 0" class="no-events">
+      <i class="info-icon">ℹ</i>
+      <p>No hay eventos disponibles en este momento.</p>
+      <button class="add-event-btn large" (click)="navigateToCreateEvent()">Crear el primer evento</button>
+    </div>
+  </div>
+  
+  <!-- Botón flotante para crear eventos (solo visible cuando hay eventos) -->
+  <div class="create-event-fab" *ngIf="events.length > 0 && !isLoading && !error">
+    <button class="btn-fab" (click)="navigateToCreateEvent()">+</button>
+  </div>
 </div>
