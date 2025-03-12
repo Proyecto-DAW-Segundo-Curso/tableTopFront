@@ -139,16 +139,23 @@ export class EventsService {
 
   // Obtener nombres de usuarios por IDs
   getUserNames(userIds: string[]): Observable<{[key: string]: string}> {
+    if (!userIds || userIds.length === 0) {
+      return of({});
+    }
+    
+    console.log('Obteniendo nombres para los siguientes UIDs:', userIds);
+    
     return from(this.getHeaders()).pipe(
       switchMap(headers => {
-        return this.http.post<{[key: string]: string}>(`${this.apiUrl}/user-names`, userIds, {
+        return this.http.post<{[key: string]: string}>('http://localhost:8080/api/users/names', userIds, {
           headers,
           withCredentials: true
         });
       }),
       catchError(error => {
         console.error('Error al obtener nombres de usuarios:', error);
-        return of({}); // Retorna un objeto vacío en caso de error
+        // Retornar un objeto vacío para manejar el error silenciosamente
+        return of({});
       })
     );
   }

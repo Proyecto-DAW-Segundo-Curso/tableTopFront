@@ -28,6 +28,10 @@
 
         <div class="card-content" *ngIf="!showParticipants">
             <div class="field">
+                <label>Creador</label>
+                <p>{{ getCreatorName() }}</p>
+            </div>
+            <div class="field">
                 <label>Ubicación del evento</label>
                 <p>{{ event.location || 'Sin ubicación' }}</p>
             </div>
@@ -48,12 +52,21 @@
         </div>
         <div class="card-content" *ngIf="showParticipants">
             <h2>Lista de Participantes</h2>
-            <div class="participants-list">
+            <div *ngIf="loadingUserNames" class="loading-indicator">
+                <div class="spinner-small"></div>
+                <p>Cargando participantes...</p>
+            </div>
+            <div class="participants-list" *ngIf="!loadingUserNames">
                 <div *ngIf="!event.participants || event.participants.length === 0" class="no-participants">
                     Aún no hay participantes
                 </div>
                 <div class="participant" *ngFor="let participant of event.participants">
-                    {{ participant }}
+                    <div class="participant-info">
+                        <span class="participant-name">{{ getUserName(participant) }}</span>
+                        <span class="participant-id">({{ participant.substring(0, 8) }}...)</span>
+                    </div>
+                    <div class="participant-badge" *ngIf="participant === event.creatorId">Creador</div>
+                    <div class="participant-badge current" *ngIf="participant === currentUserId">Tú</div>
                 </div>
             </div>
             <div class="button-container">

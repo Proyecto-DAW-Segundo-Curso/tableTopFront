@@ -23,6 +23,10 @@ export class EventosComponent implements OnInit, OnChanges {
   isJoined: boolean = false;
   error: string = '';
   isLoading: boolean = false;
+  
+  // Mapa para almacenar nombres de usuarios
+  userNames: {[key: string]: string} = {};
+  loadingUserNames: boolean = false;
 
   constructor(
     private router: Router, 
@@ -38,9 +42,57 @@ export class EventosComponent implements OnInit, OnChanges {
   ngOnChanges(): void {
     // Cuando cambie el evento, actualizar el estado
     this.updateJoinStatus();
+    
+    // Si el evento tiene participantes, cargar sus nombres
+    if (this.event && this.event.participants && this.event.participants.length > 0) {
+      this.loadUserNames();
+    }
   }
   
-  // Formatear la fecha para evitar el error del DatePipe
+  // Cargar nombres de usuarios participantes
+  loadUserNames(): void {
+    if (!this.event || !this.event.participants || this.event.participants.length === 0) {
+      return;
+    }
+    
+    // Añadir también el creador para obtener su nombre
+    const userIds = [...this.event.participants];
+    if (this.event.creatorId && !userIds.includes(this.event.creatorId)) {
+      userIds.push(this.event.creatorId);
+    }
+    
+    this.loadingUserNames = true;
+    
+    this.eventsService.getUserNames(userIds).subscribe({
+      next: (names) => {
+        this.userNames = names;
+        this.loadingUserNames = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar nombres de usuarios:', err);
+        this.loadingUserNames = false;
+      }
+    });
+  }
+  
+  // Obtener nombre de usuario por ID
+  getUserName(userId: string): string {
+    return this.userNames[userId] || `Usuario ${userId.substring(0, 5)}...`;
+  }
+  
+  // Obtener nombre del creador del evento
+  getCreatorName(): string {
+    if (!this.event || !this.event.creatorId) {
+      return 'Desconocido';
+    }
+    return this.getUserName(this.event.creatorId);
+  }
+  
+  // Verificar si el usuario actual es el creador
+  isCreator(): boolean {
+    return this.event?.creatorId === this.currentUserId;
+  }
+
   formatDateTime(dateTimeStr: string | any[] | undefined): string {
     if (!dateTimeStr) return 'Fecha no disponible';
     
@@ -137,6 +189,12 @@ export class EventosComponent implements OnInit, OnChanges {
 
   toggleParticipantsList(): void {
     this.showParticipants = !this.showParticipants;
+    
+    // Si mostramos la lista de participantes y no hemos cargado los nombres aún
+    if (this.showParticipants && this.event && this.event.participants && 
+        this.event.participants.length > 0 && Object.keys(this.userNames).length === 0) {
+      this.loadUserNames();
+    }
   }
 
   toggleJoin(): void {

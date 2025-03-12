@@ -181,10 +181,40 @@
 }
 
 .participant {
-    padding: 10px;
+    padding: 12px;
     background: #f5f5f5;
     border-radius: 4px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .participant-info {
+        display: flex;
+        flex-direction: column;
+        
+        .participant-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .participant-id {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+    }
+    
+    .participant-badge {
+        background-color: #3498db;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        
+        &.current {
+            background-color: #2ecc71;
+        }
+    }
 }
 
 h2 {
@@ -237,4 +267,24 @@ h2 {
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
     }
+}
+
+.spinner-small {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 136, 31, 0.3);
+    border-radius: 50%;
+    border-top-color: #FF881F;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 10px;
+}
+
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #7f8c8d;
+    font-size: 0.9em;
 }
