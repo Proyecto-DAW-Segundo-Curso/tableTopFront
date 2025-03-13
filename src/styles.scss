@@ -55,6 +55,26 @@ body {
   /* Elimina el contorno azul por defecto */
 }
 
+// .login-input {
+//   background-color: #3d3d3d;
+//   border: 1px solid #4d4d4d;
+//   color: white;
+//   border-radius: 5px;
+//   padding: 10px 15px;
+  
+//   &:focus {
+//       background-color: #3d3d3d;
+//       border-color: #6c757d;
+//       color: white;
+//       box-shadow: none;
+//   }
+
+//   &::placeholder {
+//       color: #6c757d;
+//   }
+// }
+
+
 /* Estilos del botón */
 .login-btn {
   background-color: #FF881F;

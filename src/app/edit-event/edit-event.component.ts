@@ -34,7 +34,7 @@ export class EditEventComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3)]],
       location: ['', Validators.required],
       dateTime: ['', Validators.required],
-      maxPlayers: [2, [Validators.required, Validators.min(2), Validators.max(20)]]
+      maxPlayers: [1, [Validators.required, Validators.min(1), Validators.max(100)]]
     });
   }
 
