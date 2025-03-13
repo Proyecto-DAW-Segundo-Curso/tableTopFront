@@ -64,22 +64,3 @@ small {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-
-.current-event-info {
-    background-color: #3d3d3d;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    border-left: 4px solid #007bff;
-
-    p {
-        color: #ffffff;
-        margin: 0;
-
-        &.current-date {
-            font-size: 1.1em;
-            font-weight: 500;
-            color: #007bff;
-        }
-    }
-}
