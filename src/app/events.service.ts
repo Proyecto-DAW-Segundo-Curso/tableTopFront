@@ -137,6 +137,26 @@ export class EventsService {
     );
   }
 
+  // Obtener un evento específico por ID
+  getEvent(eventId: number): Observable<Event> {
+    console.log(`Intentando obtener evento con ID: ${eventId}`);
+    return from(this.getHeaders()).pipe(
+      switchMap(headers => {
+        return this.http.get<Event>(`${this.apiUrl}/${eventId}`, { 
+          headers,
+          withCredentials: true
+        });
+      }),
+      catchError(error => {
+        console.error('Error en getEvent:', error);
+        if (error.status === 404) {
+          return throwError(() => new Error('Evento no encontrado'));
+        }
+        return throwError(() => new Error(error.message || 'Error al obtener el evento'));
+      })
+    );
+  }
+
   // Obtener nombres de usuarios por IDs
   getUserNames(userIds: string[]): Observable<{[key: string]: string}> {
     if (!userIds || userIds.length === 0) {

@@ -1,17 +1,33 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Auth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile, User, UserCredential } from '@angular/fire/auth';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Auth, createUserWithEmailAndPassword, 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  updateProfile, 
+  User, 
+  UserCredential } from '@angular/fire/auth';
+import { BehaviorSubject, Observable, of, firstValueFrom } from 'rxjs';
+import { filter, first, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private currentUserSubject: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
-  public currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
+  // Usamos undefined para indicar que aún no se ha determinado el estado
+  private currentUserSubject: BehaviorSubject<User | null | undefined> = new BehaviorSubject<User | null | undefined>(undefined);
+  public currentUser$: Observable<User | null | undefined> = this.currentUserSubject.asObservable();
+  
+  // Observable que emite solo cuando el estado de autenticación está determinado (no undefined)
+  public authStateReady$: Observable<User | null> = this.currentUser$.pipe(
+    filter(user => user !== undefined),
+    switchMap(user => of(user as User | null)) // Convertir undefined a null si es necesario
+  );
 
   constructor(private auth: Auth, private router: Router) {
+    console.log('Inicializando AuthService, esperando estado de autenticación...');
+    
     // Persistencia del estado de autenticación
     onAuthStateChanged(this.auth, (user) => {
       this.currentUserSubject.next(user);
@@ -20,7 +36,15 @@ export class AuthService {
       } else {
         console.log('Usuario no autenticado');
       }
+    }, (error) => {
+      console.error('Error en el observador de autenticación:', error);
+      this.currentUserSubject.next(null); // En caso de error, asumimos no autenticado
     });
+  }
+
+  // Esperar a que el estado de autenticación esté determinado
+  waitForAuthReady(): Observable<User | null> {
+    return this.authStateReady$.pipe(first());
   }
 
   // Registrar nuevo usuario
@@ -62,7 +86,21 @@ export class AuthService {
 
   // Obtener usuario actual
   getCurrentUser(): User | null {
+    // El método auth.currentUser podría estar desincronizado con el estado que manejamos
+    // Si estamos seguros de que el estado está determinado, podemos confiar en currentUserSubject
+    const currentValue = this.currentUserSubject.value;
+    if (currentValue !== undefined) {
+      return currentValue;
+    }
+    
+    // Si el estado aún no está determinado, recurrimos a auth.currentUser
     return this.auth.currentUser;
+  }
+
+  // Obtener usuario actual (versión asíncrona que espera a que el estado esté determinado)
+  async getCurrentUserAsync(): Promise<User | null> {
+    await firstValueFrom(this.waitForAuthReady());
+    return this.currentUserSubject.value || null;
   }
 
   // Verificar si el usuario está autenticado
