@@ -58,7 +58,7 @@ export class CreateEventComponent {
       this.eventService.addEvent(eventData).subscribe({
         next: (response) => {
           console.log('Evento creado exitosamente:', response);
-          this.router.navigate(['/eventos']);
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           console.error('Error al crear el evento:', error);

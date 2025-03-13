@@ -13,14 +13,13 @@
   <div *ngIf="error" class="error-message">
     <i class="error-icon">⚠</i>
     {{ error }}
-    <button class="retry-btn" (click)="loadEvents()">Reintentar</button>
+    <button class="retry-btn" (click)="loadUserEvents()">Reintentar</button>
   </div>
   
   <!-- Contenedor de los eventos -->
   <div class="events-container" *ngIf="!isLoading && !error">
     <div class="events-header">
       <h3>Eventos disponibles ({{ events.length }})</h3>
-      <button class="add-event-btn" (click)="navigateToCreateEvent()">Crear nuevo evento</button>
     </div>
     
     <div class="events-grid">

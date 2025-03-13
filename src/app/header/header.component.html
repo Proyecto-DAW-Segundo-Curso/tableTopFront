@@ -12,7 +12,7 @@
      <!-- Quitar la ! para que se muestre al logearse -->
     <div class="user-info" *ngIf="currentUser$ | async as user"> 
       <i class="fas fa-user"></i>
-      <span>Conectado como: <strong>{{ user.displayName }}</strong></span>
+      <span>Usuario conectado: <strong>{{ user.displayName }}</strong></span>
     </div>
   </div>
 
@@ -20,7 +20,6 @@
     <!-- Navbar para usuarios logueados -->
     <nav *ngIf="currentUser$ | async as user">
       <button routerLink="/dashboard">Dashboard</button>
-      <button routerLink="/eventos">Eventos</button>
       <button routerLink="/create-event" class="create-event-btn">
         <i class="fas fa-plus"></i> Crear Evento
       </button>

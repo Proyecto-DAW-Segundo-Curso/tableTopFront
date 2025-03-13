@@ -38,92 +38,87 @@ export class EditEventComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.loading = true;
-    
-    // Obtener el ID del evento de la URL
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) {
-      this.error = 'ID de evento no encontrado';
-      this.loading = false;
-      return;
+  async ngOnInit() {
+    try {
+      // Cargar información del evento
+      this.route.params.subscribe(params => {
+        this.eventId = params['id'];
+        this.loadEvent();
+      });
+
+      // Cargar usuario actual
+      const user = await this.authService.getCurrentUserAsync();
+      
+      if (user) {
+        this.currentUserId = user.uid;
+      } else {
+        this.router.navigate(['/login']);
+      }
+
+    } catch (error) {
+      console.error('Error al cargar la página de edición', error);
     }
+  }
+  
+  async loadEvent(): Promise<void> {
+    this.loading = true;
+    this.error = null;
     
-    this.eventId = +id;
     if (isNaN(this.eventId) || this.eventId <= 0) {
+      console.error('ID de evento inválido:', this.eventId);
       this.error = 'ID de evento inválido';
       this.loading = false;
       return;
     }
     
-    // Cargar el usuario y después el evento
-    this.loadUserAndEvent();
-  }
-  
-  async loadUserAndEvent(): Promise<void> {
-    try {
-      // Obtener el usuario actual de forma asíncrona
-      const user = await this.authService.getCurrentUser();
-      
-      if (!user) {
-        this.error = 'Usuario no autenticado';
-        this.loading = false;
-        return;
-      }
-      
-      this.currentUserId = user.uid;
-      
-      // Obtener todos los eventos
-      this.eventsService.getAllEvents().subscribe({
-        next: (events) => {
-          const eventFound = events.find(e => e.id === this.eventId);
-          
-          if (!eventFound) {
-            this.error = 'Evento no encontrado';
-            this.loading = false;
-            return;
-          }
-          
-          // Comprobar si el usuario es el creador
-          if (eventFound.creatorId !== this.currentUserId) {
-            this.error = 'No tienes permisos para editar este evento';
-            this.loading = false;
-            return;
-          }
-          
-          this.event = eventFound;
-          
-          // Cargar los datos del evento en el formulario
-          // Formatear la fecha para el input datetime-local
-          let dateTimeStr = '';
-          if (eventFound.dateTime) {
-            const date = new Date(eventFound.dateTime);
-            if (!isNaN(date.getTime())) {
-              // Formato YYYY-MM-DDThh:mm
-              dateTimeStr = date.toISOString().substring(0, 16);
-            }
-          }
-          
-          this.eventForm.patchValue({
-            name: eventFound.name,
-            location: eventFound.location,
-            dateTime: dateTimeStr,
-            maxPlayers: eventFound.maxPlayers
-          });
-          
+    console.log(`Intentando cargar evento con ID: ${this.eventId}`);
+    
+    // Obtener el evento
+    this.eventsService.getEvent(this.eventId).subscribe({
+      next: (eventFound: Event) => {
+        console.log('Evento recibido:', eventFound);
+        if (!eventFound) {
+          this.error = 'Evento no encontrado';
           this.loading = false;
-        },
-        error: (error: any) => {
-          console.error('Error al cargar el evento:', error);
-          this.error = error.message || 'Error al cargar el evento';
-          this.loading = false;
+          return;
         }
-      });
-    } catch (error: any) {
-      console.error('Error al obtener el usuario:', error);
-      this.error = error.message || 'Error al obtener el usuario';
-      this.loading = false;
-    }
+        
+        // Comprobar si el usuario es el creador
+        if (eventFound.creatorId !== this.currentUserId) {
+          console.warn(`Usuario ${this.currentUserId} no es el creador del evento (creador: ${eventFound.creatorId})`);
+          this.error = 'No tienes permisos para editar este evento';
+          this.loading = false;
+          return;
+        }
+        
+        this.event = eventFound;
+        
+        // Cargar los datos del evento en el formulario
+        // Formatear la fecha para el input datetime-local
+        let dateTimeStr = '';
+        if (eventFound.dateTime) {
+          const date = new Date(eventFound.dateTime);
+          if (!isNaN(date.getTime())) {
+            // Formato YYYY-MM-DDThh:mm
+            dateTimeStr = date.toISOString().substring(0, 16);
+          }
+        }
+        
+        this.eventForm.patchValue({
+          name: eventFound.name,
+          location: eventFound.location,
+          dateTime: dateTimeStr,
+          maxPlayers: eventFound.maxPlayers
+        });
+        
+        this.loading = false;
+      },
+      error: (error: any) => {
+        console.error('Error al cargar el evento:', error);
+        this.error = error.message || 'Error al cargar el evento';
+        this.loading = false;
+      }
+    });
   }
 
   onSubmit(): void {

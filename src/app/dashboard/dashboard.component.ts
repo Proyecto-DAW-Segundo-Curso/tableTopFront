@@ -18,6 +18,7 @@ export class DashboardComponent implements OnInit {
   events: Event[] = [];
   isLoading: boolean = true;
   error: string | null = null;
+  currentUserId: string | null = null;
   
   constructor(
     private authService: AuthService,
@@ -26,22 +27,26 @@ export class DashboardComponent implements OnInit {
   ) {}
   
   ngOnInit(): void {
-    this.loadUserInfo();
-    this.loadEvents();
+    this.loadCurrentUser();
   }
   
-  async loadUserInfo(): Promise<void> {
+  async loadCurrentUser(): Promise<void> {
     try {
-      const user = await this.authService.getCurrentUser();
+      const user = await this.authService.getCurrentUserAsync();
       if (user) {
+        this.currentUserId = user.uid;
         this.userName = user.displayName || user.email || 'Usuario';
+        this.loadUserEvents();
+      } else {
+        console.log('Usuario no autenticado');
+        this.router.navigate(['/login']);
       }
     } catch (error) {
-      console.error('Error al cargar la información del usuario:', error);
+      console.error('Error al obtener el usuario actual:', error);
     }
   }
   
-  loadEvents(): void {
+  loadUserEvents(): void {
     this.isLoading = true;
     this.error = null;
     
@@ -160,7 +165,7 @@ export class DashboardComponent implements OnInit {
   handleEventUpdated(): void {
     console.log('Evento actualizado, recargando eventos...');
     // Recargamos todos los eventos para tener la lista actualizada
-    this.loadEvents();
+    this.loadUserEvents();
   }
   
   navigateToCreateEvent(): void {
