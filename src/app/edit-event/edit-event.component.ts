@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EventsService } from '../events.service';
@@ -12,7 +12,8 @@ import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './edit-event.component.html',
-  styleUrl: './edit-event.component.scss'
+  styleUrl: './edit-event.component.scss',
+  providers: [DatePipe]
 })
 export class EditEventComponent implements OnInit {
   eventForm!: FormGroup;
@@ -22,13 +23,15 @@ export class EditEventComponent implements OnInit {
   error: string | null = null;
   event: Event | null = null;
   currentUserId: string = '';
+  eventData: Event | null = null;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private eventsService: EventsService,
-    private authService: AuthService
+    private authService: AuthService,
+    private datePipe: DatePipe
   ) { 
     this.eventForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -61,64 +64,49 @@ export class EditEventComponent implements OnInit {
   }
   
   async loadEvent(): Promise<void> {
-    this.loading = true;
-    this.error = null;
-    
-    if (isNaN(this.eventId) || this.eventId <= 0) {
+    if (!this.eventId) {
       console.error('ID de evento inválido:', this.eventId);
       this.error = 'ID de evento inválido';
-      this.loading = false;
       return;
     }
-    
-    console.log(`Intentando cargar evento con ID: ${this.eventId}`);
-    
-    // Obtener el evento
-    this.eventsService.getEvent(this.eventId).subscribe({
-      next: (eventFound: Event) => {
-        console.log('Evento recibido:', eventFound);
-        if (!eventFound) {
-          this.error = 'Evento no encontrado';
-          this.loading = false;
-          return;
-        }
-        
-        // Comprobar si el usuario es el creador
-        if (eventFound.creatorId !== this.currentUserId) {
-          console.warn(`Usuario ${this.currentUserId} no es el creador del evento (creador: ${eventFound.creatorId})`);
-          this.error = 'No tienes permisos para editar este evento';
-          this.loading = false;
-          return;
-        }
-        
-        this.event = eventFound;
-        
-        // Cargar los datos del evento en el formulario
-        // Formatear la fecha para el input datetime-local
-        let dateTimeStr = '';
-        if (eventFound.dateTime) {
-          const date = new Date(eventFound.dateTime);
-          if (!isNaN(date.getTime())) {
-            // Formato YYYY-MM-DDThh:mm
-            dateTimeStr = date.toISOString().substring(0, 16);
-          }
-        }
-        
-        this.eventForm.patchValue({
-          name: eventFound.name,
-          location: eventFound.location,
-          dateTime: dateTimeStr,
-          maxPlayers: eventFound.maxPlayers
-        });
-        
-        this.loading = false;
-      },
-      error: (error: any) => {
-        console.error('Error al cargar el evento:', error);
-        this.error = error.message || 'Error al cargar el evento';
-        this.loading = false;
+
+    this.loading = true;
+    this.error = null;
+
+    try {
+      console.log('Intentando cargar evento con ID:', this.eventId);
+      const eventFound = await this.eventsService.getEvent(this.eventId).toPromise();
+      console.log('Evento recibido:', eventFound);
+
+      if (!eventFound) {
+        this.error = 'Evento no encontrado';
+        return;
       }
-    });
+
+      // Verificar si el usuario actual es el creador del evento
+      const currentUser = await this.authService.getCurrentUser();
+      if (!currentUser || currentUser.uid !== eventFound.creatorId) {
+        console.warn(`Usuario ${currentUser?.uid} no es el creador del evento (creador: ${eventFound.creatorId})`);
+        this.error = 'No tienes permiso para editar este evento';
+        return;
+      }
+
+      // Asignar el evento encontrado a eventData
+      this.eventData = eventFound;
+
+      // Actualizar el formulario con los datos del evento
+      this.eventForm.patchValue({
+        name: eventFound.name,
+        dateTime: this.formatDateForInput(eventFound.dateTime),
+        location: eventFound.location,
+        maxPlayers: eventFound.maxPlayers
+      });
+    } catch (error) {
+      console.error('Error al cargar el evento:', error);
+      this.error = 'Error al cargar el evento';
+    } finally {
+      this.loading = false;
+    }
   }
 
   onSubmit(): void {
@@ -170,5 +158,123 @@ export class EditEventComponent implements OnInit {
 
   cancelEdit(): void {
     this.router.navigate(['/dashboard']);
+  }
+
+  formatDateTime(dateTimeStr: string | any[] | undefined): string {
+    if (!dateTimeStr) return 'Fecha no disponible';
+    
+    try {
+      // Si es un string con formato ISO
+      if (typeof dateTimeStr === 'string') {
+        if (dateTimeStr.includes('T')) {
+          return this.datePipe.transform(new Date(dateTimeStr), 'medium') || 'Fecha inválida';
+        }
+        
+        // Si es un string que contiene una lista separada por comas
+        if (dateTimeStr.includes(',')) {
+          const parts = dateTimeStr.split(',').map(part => parseInt(part.trim()));
+          if (parts.length >= 3) {
+            const year = parts[0];
+            const month = parts[1] - 1;
+            const day = parts[2];
+            const hours = parts.length > 3 ? parts[3] : 0;
+            const minutes = parts.length > 4 ? parts[4] : 0;
+            
+            const date = new Date(year, month, day, hours, minutes);
+            
+            if (isNaN(date.getTime())) {
+              console.error('Fecha inválida creada a partir de:', parts);
+              return 'Fecha inválida';
+            }
+            
+            return this.datePipe.transform(date, 'medium') || 'Fecha inválida';
+          }
+        }
+      }
+      
+      // Si es un array
+      if (Array.isArray(dateTimeStr) && dateTimeStr.length >= 3) {
+        const year = dateTimeStr[0];
+        const month = dateTimeStr[1] - 1;
+        const day = dateTimeStr[2];
+        const hours = dateTimeStr.length > 3 ? dateTimeStr[3] : 0;
+        const minutes = dateTimeStr.length > 4 ? dateTimeStr[4] : 0;
+        
+        const date = new Date(year, month, day, hours, minutes);
+        
+        if (isNaN(date.getTime())) {
+          console.error('Fecha inválida creada a partir de:', dateTimeStr);
+          return 'Fecha inválida';
+        }
+        
+        return this.datePipe.transform(date, 'medium') || 'Fecha inválida';
+      }
+      
+      console.warn('Formato de fecha no reconocido:', dateTimeStr);
+      return String(dateTimeStr);
+      
+    } catch (error) {
+      console.error('Error al formatear fecha:', error, 'Valor original:', dateTimeStr);
+      return 'Error de formato';
+    }
+  }
+
+  formatDateForInput(dateTimeStr: string | null): string {
+    if (!dateTimeStr) return '';
+    
+    try {
+      // Si es un string con formato ISO
+      if (typeof dateTimeStr === 'string') {
+        if (dateTimeStr.includes('T')) {
+          return dateTimeStr.substring(0, 16);
+        }
+        
+        // Si es un string que contiene una lista separada por comas
+        if (dateTimeStr.includes(',')) {
+          const parts = dateTimeStr.split(',').map(part => parseInt(part.trim()));
+          if (parts.length >= 3) {
+            const year = parts[0];
+            const month = parts[1] - 1;
+            const day = parts[2];
+            const hours = parts.length > 3 ? parts[3] : 0;
+            const minutes = parts.length > 4 ? parts[4] : 0;
+            
+            const date = new Date(year, month, day, hours, minutes);
+            
+            if (isNaN(date.getTime())) {
+              console.error('Fecha inválida creada a partir de:', parts);
+              return '';
+            }
+            
+            return date.toISOString().substring(0, 16);
+          }
+        }
+      }
+      
+      // Si es un array
+      if (Array.isArray(dateTimeStr) && dateTimeStr.length >= 3) {
+        const year = dateTimeStr[0];
+        const month = dateTimeStr[1] - 1;
+        const day = dateTimeStr[2];
+        const hours = dateTimeStr.length > 3 ? dateTimeStr[3] : 0;
+        const minutes = dateTimeStr.length > 4 ? dateTimeStr[4] : 0;
+        
+        const date = new Date(year, month, day, hours, minutes);
+        
+        if (isNaN(date.getTime())) {
+          console.error('Fecha inválida creada a partir de:', dateTimeStr);
+          return '';
+        }
+        
+        return date.toISOString().substring(0, 16);
+      }
+      
+      console.warn('Formato de fecha no reconocido:', dateTimeStr);
+      return '';
+      
+    } catch (error) {
+      console.error('Error al formatear fecha:', error, 'Valor original:', dateTimeStr);
+      return '';
+    }
   }
 }
