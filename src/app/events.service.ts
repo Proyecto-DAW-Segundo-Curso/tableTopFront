@@ -109,7 +109,7 @@ export class EventsService {
   leaveEvent(eventId: number): Observable<any> {
     return from(this.getHeaders()).pipe(
       switchMap(headers => {
-        return this.http.post(`${this.apiUrl}/${eventId}/leave`, {}, { 
+        return this.http.post<{message: string}>(`${this.apiUrl}/${eventId}/leave`, {}, { 
           headers,
           withCredentials: true
         });
