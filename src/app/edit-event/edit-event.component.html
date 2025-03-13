@@ -1,59 +1,63 @@
-<div class="container">
-    <div class="card form-card">
-        <h2>Editar Evento</h2>
-
-        <div *ngIf="loading" class="loading-indicator">
-            <div class="spinner"></div>
-            <p>Cargando evento...</p>
+<div class="d-flex justify-content-center align-items-center">
+    <div class="card login-card">
+        <!-- Encabezado -->
+        <div class="login-header">
+            <h3 class="m-0">Editar Evento</h3>
         </div>
 
-        <div *ngIf="error" class="error-message">
-            {{ error }}
+        <div class="p-3">
+            <div *ngIf="loading" class="text-center">
+                <div class="spinner"></div>
+                <p>Cargando evento...</p>
+            </div>
+
+            <div *ngIf="error" class="error-message">
+                {{ error }}
+            </div>
+
+            <form *ngIf="!loading && !error" [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                    <label class="form-label text-dark" for="name">Nombre del evento</label>
+                    <input class="form-control login-input" type="text" id="name" formControlName="name" required
+                        placeholder="Nombre del evento">
+                    <div *ngIf="eventForm.get('name')?.invalid && eventForm.get('name')?.touched">
+                        <small>El nombre del evento es obligatorio</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label text-dark" for="dateTime">Fecha y hora</label>
+                    <input class="form-control login-input" type="datetime-local" id="dateTime" formControlName="dateTime" required>
+                    <div *ngIf="eventForm.get('dateTime')?.invalid && eventForm.get('dateTime')?.touched">
+                        <small>La fecha y hora son obligatorias</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label text-dark" for="location">Ubicación evento</label>
+                    <input class="form-control login-input" type="text" id="location" formControlName="location" required
+                        placeholder="Ubicación del evento">
+                    <div *ngIf="eventForm.get('location')?.invalid && eventForm.get('location')?.touched">
+                        <small>La ubicación es obligatoria</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label text-dark" for="maxPlayers">Límite de participantes</label>
+                    <input class="form-control login-input" type="number" id="maxPlayers" formControlName="maxPlayers" required
+                        placeholder="Número máximo de participantes" min="1">
+                    <div *ngIf="eventForm.get('maxPlayers')?.invalid && eventForm.get('maxPlayers')?.touched">
+                        <small>El límite de participantes debe ser al menos 1</small>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="button" class="btn btn-secondary" (click)="cancelEdit()" [disabled]="submitting">Cancelar</button>
+                    <button type="submit" class="btn login-btn" [disabled]="eventForm.invalid || submitting">
+                        <span *ngIf="submitting">Guardando...</span>
+                        <span *ngIf="!submitting">Guardar Cambios</span>
+                    </button>
+                </div>
+            </form>
         </div>
-
-        <form *ngIf="!loading && !error" [formGroup]="eventForm" (ngSubmit)="onSubmit()">
-            <div class="form-group">
-                <label for="name">Nombre del Evento</label>
-                <input type="text" id="name" formControlName="name" class="form-control">
-                <div *ngIf="eventForm.get('name')?.touched && eventForm.get('name')?.invalid" class="error-text">
-                    <span *ngIf="eventForm.get('name')?.errors?.['required']">El nombre es obligatorio.</span>
-                    <span *ngIf="eventForm.get('name')?.errors?.['minlength']">El nombre debe tener al menos 3 caracteres.</span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="location">Ubicación</label>
-                <input type="text" id="location" formControlName="location" class="form-control">
-                <div *ngIf="eventForm.get('location')?.touched && eventForm.get('location')?.invalid" class="error-text">
-                    <span *ngIf="eventForm.get('location')?.errors?.['required']">La ubicación es obligatoria.</span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="dateTime">Fecha y Hora</label>
-                <input type="datetime-local" id="dateTime" formControlName="dateTime" class="form-control">
-                <div *ngIf="eventForm.get('dateTime')?.touched && eventForm.get('dateTime')?.invalid" class="error-text">
-                    <span *ngIf="eventForm.get('dateTime')?.errors?.['required']">La fecha y hora son obligatorias.</span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="maxPlayers">Límite de Participantes</label>
-                <input type="number" id="maxPlayers" formControlName="maxPlayers" min="2" max="20" class="form-control">
-                <div *ngIf="eventForm.get('maxPlayers')?.touched && eventForm.get('maxPlayers')?.invalid" class="error-text">
-                    <span *ngIf="eventForm.get('maxPlayers')?.errors?.['required']">El límite de participantes es obligatorio.</span>
-                    <span *ngIf="eventForm.get('maxPlayers')?.errors?.['min']">Debe haber al menos 2 participantes.</span>
-                    <span *ngIf="eventForm.get('maxPlayers')?.errors?.['max']">El límite máximo es de 20 participantes.</span>
-                </div>
-            </div>
-
-            <div class="button-group">
-                <button type="button" class="btn-secondary" (click)="cancelEdit()" [disabled]="submitting">Cancelar</button>
-                <button type="submit" class="btn-primary" [disabled]="submitting">
-                    <span *ngIf="submitting">Guardando...</span>
-                    <span *ngIf="!submitting">Guardar Cambios</span>
-                </button>
-            </div>
-        </form>
     </div>
 </div>

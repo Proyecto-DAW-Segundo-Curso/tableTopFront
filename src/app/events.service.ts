@@ -109,7 +109,7 @@ export class EventsService {
   leaveEvent(eventId: number): Observable<any> {
     return from(this.getHeaders()).pipe(
       switchMap(headers => {
-        return this.http.post(`${this.apiUrl}/${eventId}/leave`, {}, { 
+        return this.http.post<{message: string}>(`${this.apiUrl}/${eventId}/leave`, {}, { 
           headers,
           withCredentials: true
         });
@@ -133,6 +133,26 @@ export class EventsService {
       catchError(error => {
         console.error('Error en updateEvent:', error);
         return throwError(() => new Error(error.message || 'Error al actualizar el evento'));
+      })
+    );
+  }
+
+  // Obtener un evento específico por ID
+  getEvent(eventId: number): Observable<Event> {
+    console.log(`Intentando obtener evento con ID: ${eventId}`);
+    return from(this.getHeaders()).pipe(
+      switchMap(headers => {
+        return this.http.get<Event>(`${this.apiUrl}/${eventId}`, { 
+          headers,
+          withCredentials: true
+        });
+      }),
+      catchError(error => {
+        console.error('Error en getEvent:', error);
+        if (error.status === 404) {
+          return throwError(() => new Error('Evento no encontrado'));
+        }
+        return throwError(() => new Error(error.message || 'Error al obtener el evento'));
       })
     );
   }

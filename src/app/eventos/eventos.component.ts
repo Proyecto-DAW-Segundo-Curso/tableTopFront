@@ -247,7 +247,7 @@ export class EventosComponent implements OnInit, OnChanges {
         },
         error: (err) => {
           console.error('Error al unirse al evento:', err);
-          alert('No se pudo unir al evento. Intente nuevamente.');
+          alert('No se admiten más participantes, lo sentimos.');
           this.isLoading = false;
         }
       });

@@ -2,12 +2,14 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { map, take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const authService = inject(AuthService);
 
-  return authService.currentUser$.pipe(
+  // Usamos authStateReady$ que solo emite cuando el estado de autenticación está determinado
+  return authService.authStateReady$.pipe(
     take(1),
     map(user => {
       const isLoginPage = state.url === '/login';
@@ -31,7 +33,8 @@ export const loginGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const authService = inject(AuthService);
 
-  return authService.currentUser$.pipe(
+  // Usamos authStateReady$ que solo emite cuando el estado de autenticación está determinado
+  return authService.authStateReady$.pipe(
     take(1),
     map(user => {
       if (user) {

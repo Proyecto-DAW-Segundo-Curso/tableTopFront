@@ -20,7 +20,7 @@ export class HeaderComponent implements OnInit {
     private authService: AuthService,
     private router: Router
   ) {
-    this.currentUser$ = this.authService.currentUser$;
+    this.currentUser$ = this.authService.authStateReady$;
   }
 
   ngOnInit(): void { }
